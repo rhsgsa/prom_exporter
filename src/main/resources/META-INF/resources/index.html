@@ -1,0 +1,113 @@
+<html>
+    <header>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="jquery-ui.min.css">
+  <script src="jquery.datetimepicker.full.min.js"></script>
+  <script src="moment-with-locales.js"></script>
+  
+  <link rel="stylesheet" href="jquery.datetimepicker.min.css">
+  
+    </header>
+    <form action="/api/csvString">
+    <table>
+        <tr>
+            <td>Timezone
+            </td>
+            <td><div id="timezone"></div></td>
+        </tr>
+        <tr>
+            <td>Query</td>
+            <td>
+                <select name="query">
+                    <options>
+                        <option value="sum(container_memory_usage_bytes{container!='POD', container!='',pod!=''}) by (namespace)">Memory Usage</option>
+                        <option value="sum(rate(container_cpu_usage_seconds_total{container!='POD',container!='',pod!=''}[5m])) BY ( namespace)">CPU Usage</option>
+                    </options>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Start Date</td>
+            <td><input type="text" class="datetimepicker" name="startStr" id="startStr" onchange="javascript:updateStart()" autocomplete="off"/>
+            <input type="hidden" name="start" id="start"/></td>
+            
+        </tr>
+        <tr>
+            <td>End Date</td>
+            <td><input type="text" class="datetimepicker" name="endStr" id="endStr" onchange="javascript:updateEnd()" onkeyup="javascript:updateEnd()" autocomplete="off"/>
+                <input type="hidden" name="end" id="end"/></td>
+        </tr>
+        <tr>
+            <td>Sampling Frequency</td>
+            <td> <select name="step">
+                <options>
+                    <option value="86400">Daily</option>
+                    <option value="3600">Hourly</option>
+                </options>
+            </select></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Download" onclick="javascript:download();"/></td>
+            <td></td>
+        </tr>
+    </table>
+</form>
+    <script>
+        $( function() {
+        $( ".datepicker" ).datepicker();
+        } );
+        // $.datetimepicker.setDateFormatter({
+        //     parseDate: function (date, format) {
+        //         var d = moment(date, format);
+        //         return d.isValid() ? d.toDate() : false;
+        //     },
+        //     formatDate: function (date, format) {
+        //         return moment(date).format(format);
+        //     },
+        // });
+        jQuery.datetimepicker.setLocale('en');
+        $("#timezone").html(Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+        $('.datetimepicker').datetimepicker({
+            // dateFormat: 'dd-mm-yy',
+            //format:'DD/MM/YYYY HH:mm:ss'
+        });
+
+
+    </script>
+    <script>
+        function download(){
+            form.submit();
+        }
+        function updateStart(){
+            //var t = new Date( $("#startStr").val());
+            //var d = moment($("#startStr").val(),'DD/MM/YYYY HH:mm:ss')
+            var d = moment($("#startStr").val())
+            //var t = d.toDate();
+            //offset -27000000 to simulate seconds since 1970-01-01
+            //$('#start').val((t.getTime()-27000000)/1000);
+            $('#start').val(d.utc().unix());
+            //$('#start').val(t.toISOString() );
+        }
+        function updateEnd(){
+            //var t = new Date( $("#endStr").val());
+            var d = moment($("#endStr").val());
+            //var t = d.utc().toDate();
+            //var tomorrow=  d.toDate();
+            //tomorrow.setDate(t.getDate()+1);
+            //offset -27000000 to simulate seconds since 1970-01-01
+            //console.log("t:" + t);
+            $('#end').val(d.utc().unix());
+            //$('#end').val((t.getTime())/1000);
+            //$('#end').val((d.unix()));
+            //$('#end').val(t.toISOString());
+            //var date = moment.utc().format();
+            // console.log(date, "- now in UTC"); 
+            // console.log(moment.utc().unix(), "- now in UTC"); 
+            //  console.log(d.utc().format(), "- now in d"); 
+            //  console.log(d.utc().unix(), "- now in d"); 
+        }
+        
+    </script>
+</html>
