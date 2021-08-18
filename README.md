@@ -2,6 +2,7 @@
 
 This code allow user to query to prometheus API in openshift and translate the json message to CSV format.
 
+
 ## Run locally using docker
 
 ```bash
@@ -25,6 +26,9 @@ oc expose service/prom-exporter
 ```
 
 # Development
+
+Launch in Codeready Workspace
+https://workspaces.openshift.com/f?url=https://github.com/kahlai/prom_exporter.git
 
 ## Running the application in dev mode
 
