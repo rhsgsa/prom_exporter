@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -51,7 +52,7 @@ public class PromResource {
         }
     }
 
-    private void parser(Appendable sb, PromResponse r) {
+    private void parser(Appendable sb, PromResponse r, String timezone) {
         try {
 
             if (r != null && r.data != null && r.data.result != null) {
@@ -80,6 +81,7 @@ public class PromResource {
                                 Long l = Long.parseLong(b.multiply(new BigDecimal(1000)).setScale(0).toString());
                                 Timestamp t = new Timestamp(l);
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+                                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
 
                                 sb.append(sdf.format(t));
                                 sb.append(",");
@@ -101,18 +103,20 @@ public class PromResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String csvString(@QueryParam("query") String query, @QueryParam("start") String start,
             @QueryParam("startStr") String startStr, @QueryParam("end") String end,
-            @QueryParam("step") @DefaultValue("86400") String step) {
+            @QueryParam("step") @DefaultValue("86400") String step,
+            @QueryParam("timezone") @DefaultValue("Asia/Singapore") String timezone) {
         System.out.println("query : " + query);
         System.out.println("start : " + start);
         System.out.println("end : " + end);
         System.out.println("step : " + step);
+        System.out.println("timezone : " + timezone);
 
         StringBuffer sb = new StringBuffer();
         
         PromResponse r = promService.queryRange(query, start, end, step);
         System.out.println("Status : " + r.status);
         
-        parser(sb, r);
+        parser(sb, r,timezone);
 
         return sb.toString();
     }
@@ -121,14 +125,15 @@ public class PromResource {
     @Path("/csvFile")
     @Produces(MediaType.TEXT_PLAIN)
     public PromResponse csvFile(@QueryParam("query") String query, @QueryParam("start") String start,
-            @QueryParam("end") String end, @QueryParam("step") @DefaultValue("86400") String step) {
+            @QueryParam("end") String end, @QueryParam("step") @DefaultValue("86400") String step,
+            @QueryParam("timezone") @DefaultValue("Asia/Singapore") String timezone) {
         PromResponse r = promService.queryRange(query, start, end, step);
         System.out.println("Status : " + r.status);
         try {
             File f = new File("/tmp/output.csv");
             FileWriter fw = new FileWriter(f);
             BufferedWriter bw = new BufferedWriter(fw);
-            parser(bw, r);
+            parser(bw, r, timezone);
             bw.flush();
             bw.close();
         } catch (Exception err) {
