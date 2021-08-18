@@ -21,7 +21,7 @@ oc login
 
 TOKEN=$(oc whoami --show-token)
 
-oc new-app quay.io/kahlai/prom-exporter:v2 -e TOKEN=$TOKEN
+oc new-app quay.io/kahlai/prom-exporter:v3 -e TOKEN=$TOKEN
 oc expose service/prom-exporter
 ```
 
