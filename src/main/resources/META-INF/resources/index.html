@@ -14,7 +14,7 @@
         <tr>
             <td>Timezone
             </td>
-            <td><div id="timezone"></div></td>
+            <td><div id="timezoneLabel"></div><input type="hidden" id="timezone" name="timezone"/></td>
         </tr>
         <tr>
             <td>Query</td>
@@ -67,7 +67,8 @@
         //     },
         // });
         jQuery.datetimepicker.setLocale('en');
-        $("#timezone").html(Intl.DateTimeFormat().resolvedOptions().timeZone);
+        $("#timezoneLabel").html(Intl.DateTimeFormat().resolvedOptions().timeZone);
+        $("#timezone").val(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
         $('.datetimepicker').datetimepicker({
             // dateFormat: 'dd-mm-yy',

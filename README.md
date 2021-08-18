@@ -11,7 +11,7 @@ oc login
 TOKEN=$(oc whoami --show-token)
 API_ADDR=$(oc get route prometheus-k8s -n  openshift-monitoring --no-headers |  awk '{print "https://"$2}')
 
-docker run -p 8080:8080 -e TOKEN=$TOKEN -e API_ADDR=$API_ADDR quay.io/kahlai/prom-exporter:v2
+docker run -p 8080:8080 -e TOKEN=$TOKEN -e API_ADDR=$API_ADDR quay.io/kahlai/prom-exporter:v3
 ```
 
 ## Deploy to Openshift
@@ -21,7 +21,7 @@ oc login
 
 TOKEN=$(oc whoami --show-token)
 
-oc new-app quay.io/kahlai/prom-exporter:v2 -e TOKEN=$TOKEN
+oc new-app quay.io/kahlai/prom-exporter:v3 -e TOKEN=$TOKEN
 oc expose service/prom-exporter
 ```
 
