@@ -14,7 +14,7 @@ API_ADDR=$(oc get route prometheus-k8s -n  openshift-monitoring --no-headers |  
 docker run -p 8080:8080 -e TOKEN=$TOKEN -e API_ADDR=$API_ADDR quay.io/kahlai/prom-exporter:v2
 ```
 
-## Running in Openshift
+## Deploy to Openshift
 
 ```bash
 oc login
