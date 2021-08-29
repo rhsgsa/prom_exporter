@@ -11,19 +11,43 @@ oc login
 TOKEN=$(oc whoami --show-token)
 API_ADDR=$(oc get route prometheus-k8s -n  openshift-monitoring --no-headers |  awk '{print "https://"$2}')
 
-docker run -p 8080:8080 -e TOKEN=$TOKEN -e API_ADDR=$API_ADDR quay.io/kahlai/prom-exporter:v3
+docker run -p 8080:8080 -e TOKEN=$TOKEN -e API_ADDR=$API_ADDR quay.io/kahlai/prom-exporter:v4
 ```
 
-## Deploy to Openshift
+
+
+## Deploy to Openshift (Option 1)
+
+```bash
+oc login
+
+oc new-app quay.io/kahlai/prom-exporter:v4
+oc expose service/prom-exporter
+
+NAMESPACE=<project namespace you going to deploy to>
+SERVICE_ACCOUNT=prometheus-test
+
+oc create sa $SERVICE_ACCOUNT
+
+oc create clusterrolebinding $SERVICE_ACCOUNT --clusterrole prometheus-k8s --serviceaccount $NAMESPACE:$SERVICE_ACCOUNT
+
+oc patch deploy prom-exporter -p "{\"spec\" : {\"template\": {\"spec\" : {\"serviceAccount\" : \"$SERVICE_ACCOUNT\"}}}}"
+```
+
+
+
+## Deploy to Openshift (Option 2)
 
 ```bash
 oc login
 
 TOKEN=$(oc whoami --show-token)
 
-oc new-app quay.io/kahlai/prom-exporter:v3 -e TOKEN=$TOKEN
+oc new-app quay.io/kahlai/prom-exporter:v4 -e TOKEN=$TOKEN
 oc expose service/prom-exporter
 ```
+
+Note : Token will expire in option2
 
 # Development
 
@@ -48,7 +72,7 @@ export API_ADDR=$(oc get route prometheus-k8s -n  openshift-monitoring --no-head
 ## Package the application as docker image
 
 ```bash
-./mvnw clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
+mvn clean package -Pnative -Dquarkus.native.container-build=true -Dquarkus.container-image.build=true
 ```
 
 
